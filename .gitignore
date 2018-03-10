@@ -105,3 +105,5 @@ ENV/
 
 # customized
 settings.py
+cloned_repos
+.pytest_data

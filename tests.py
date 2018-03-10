@@ -1,11 +1,15 @@
-import time
+import time, pathlib, os
 from unittest import TestCase
 from bot import Bot
 import settings
+from exceptions import ClonedRepoExistedError
 
 class BotTestCase(TestCase):
 
 	def setUp(self):
+		# set up needed testing data folder
+		pathlib.Path('/test_data').mkdir(parents=True, exist_ok=True)
+		# set up bot instance
 		self.bot = Bot()
 		self.bot.login()
 
@@ -20,3 +24,15 @@ class BotTestCase(TestCase):
 		existing_issues = self.bot.get_issues(settings.DEFAULT_REPO, state='open')
 		self.assertEqual(issue['title'] in [i.title for i in existing_issues], True)
 		self.assertEqual(issue['body'] in [i.body for i in existing_issues], True)
+
+	def test_repo_clone(self):
+		expected_dir = os.sep.join(['.pytest_data', settings.DEFAULT_REPO])
+		# make sure the clone dir does not exist yet
+		self.assertEqual(os.path.isdir(expected_dir), False)
+		self.bot.repo_clone(repo_name=settings.DEFAULT_REPO, root_dir='.pytest_data')
+		self.assertEqual(os.path.isdir(expected_dir), True)
+		# test if expected_dir exist already. if yes, ClonedRepoExistedError should be thrown
+		try:
+			self.bot.repo_clone(repo_name=settings.DEFAULT_REPO, root_dir='.pytest_data')
+		except ClonedRepoExistedError:
+			self.assertEqual(True, True)
