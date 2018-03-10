@@ -26,3 +26,16 @@ class Bot(object):
 	def get_issues(self, repo_name, state='open'):
 		repo = self.github.get_user().get_repo(name=repo_name)
 		return repo.get_issues(state=state)
+
+	def report_status(self, repo_name):
+		repo = self.github.get_user().get_repo(name=repo_name)
+		return '\n'.join([
+					'Bot connected to repository: %s' % repo.full_name,
+					'    clone_url: %s' % repo.clone_url
+				])
+
+
+if __name__ == "__main__":
+	bot = Bot()
+	bot.login()
+	print(bot.report_status(repo_name=settings.DEFAULT_REPO))
