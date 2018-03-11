@@ -106,10 +106,14 @@ class Bot(object):
 		message = ' '.join(['add files:']+[os.path.basename(f) for f in chosen_files])
 		# perform commit and push to remote
 		if settings.DEFAULT_COMMIT_TOOL == 'GitPython':
-			self.addfiles_commit_push_remote(repo_name=settings.DEFAULT_REPO,
-											 root_dir=settings.DEFAULT_CLONE_ROOT_DIR,
-											 file_list=chosen_files,
-											 message=message)
+			try:
+				self.addfiles_commit_push_remote(repo_name=settings.DEFAULT_REPO,
+												 root_dir=settings.DEFAULT_CLONE_ROOT_DIR,
+												 file_list=chosen_files,
+												 message=message)
+			except BranchUpToDateException:
+				print('up to date. nothing to do. pass.')
+				pass
 		elif settings.DEFAULT_COMMIT_TOOL == 'PyGithub':
 			self.remote_addfiles_commit(repo_name=settings.DEFAULT_REPO,
 									file_list=chosen_files,
