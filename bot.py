@@ -2,7 +2,7 @@ import os, logging, shutil, glob, random
 from github import Github, InputGitTreeElement
 from git import Repo
 from git.exc import GitCommandError
-from exceptions import ClonedRepoExistedError, BranchUpToDateException
+from exceptions import ClonedRepoExistedError, BranchUpToDateException, DefaultCommitToolException
 import settings
 
 logger = logging.getLogger(__name__)
@@ -57,9 +57,9 @@ class Bot(object):
 		# enroll the files to be committed
 		element_list = list()
 		for entry in file_list:
-			with open(entry, 'r') as input_file:
+			with open(os.sep.join([settings.DEFAULT_SOURCE_ROOT_DIR, repo_name, entry]), 'r') as input_file:
 				data = input_file.read()
-			element = InputGitTreeElement(entry, '100644', 'blob', data)
+			element = InputGitTreeElement(entry.replace('\\', '/'), '100644', 'blob', data)
 			element_list.append(element)
 		# prepare commit trees and make commit request
 		tree = repo.create_git_tree(element_list, base_tree)
@@ -103,16 +103,19 @@ class Bot(object):
 		files = [f.replace(prefix, '') for f in glob.glob(search_for, recursive=True)]
 		# randomly choose one and make commit
 		chosen_files = list(random.sample(set(files), random.randint(1, 4)))
-		''' problematic, will not make dirs on the github side
-		self.remote_addfiles_commit(repo_name=settings.DEFAULT_REPO,
-									file_list = chosen_files,
-									message='add files %s' % chosen_files)
-		'''
 		message = ' '.join(['add files:']+[os.path.basename(f) for f in chosen_files])
-		self.addfiles_commit_push_remote(repo_name=settings.DEFAULT_REPO,
-										 root_dir=settings.DEFAULT_CLONE_ROOT_DIR,
-										 file_list=chosen_files,
-										 message=message)
+		# perform commit and push to remote
+		if settings.DEFAULT_COMMIT_TOOL == 'GitPython':
+			self.addfiles_commit_push_remote(repo_name=settings.DEFAULT_REPO,
+											 root_dir=settings.DEFAULT_CLONE_ROOT_DIR,
+											 file_list=chosen_files,
+											 message=message)
+		elif settings.DEFAULT_COMMIT_TOOL == 'PyGithub':
+			self.remote_addfiles_commit(repo_name=settings.DEFAULT_REPO,
+									file_list=chosen_files,
+									message=message)
+		else:
+			raise DefaultCommitToolException
 		
 if __name__ == "__main__":
 	bot = Bot()
@@ -134,7 +137,7 @@ if __name__ == "__main__":
 		print('Branch up to date. Does not commit.')
 	'''
 	''' # make remote commit through GitHub API
-	file_list = ['requirements.txt',]
+	file_list = ['settings.py',]
 	bot.remote_addfiles_commit(repo_name=settings.DEFAULT_REPO,
 							   file_list = file_list,
 							   message='add files %s' % file_list)

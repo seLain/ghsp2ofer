@@ -5,3 +5,6 @@ class ClonedRepoExistedError(Exception):
 
 class BranchUpToDateException(Exception):
 	pass
+
+class DefaultCommitToolException(Exception):
+	pass
