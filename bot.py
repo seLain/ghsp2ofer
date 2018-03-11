@@ -1,4 +1,4 @@
-import os, logging, shutil
+import os, logging, shutil, glob, random
 from github import Github, InputGitTreeElement
 from git import Repo
 from git.exc import GitCommandError
@@ -73,15 +73,15 @@ class Bot(object):
 		repo = Repo(repo_dir)
 		# copy and add files specified to local repository
 		for file in file_list:
+			src = os.sep.join([settings.DEFAULT_SOURCE_ROOT_DIR, repo_name, file])
+			dest = os.sep.join([repo_dir, file])
 			try:
-				shutil.copy2(file, os.sep.join([repo_dir, file]))
+				shutil.copy2(src, dest)
 				repo.git.add(file)
 			except IOError as e: # parent directory not exists or something wrong
-				if e.errno != errno.ENOENT:
-					raise
 				# creating parent directories
 				os.makedirs(os.path.dirname(dest))
-				shutil.copy2(file, os.sep.join([repo_dir, file]))
+				shutil.copy2(src, dest)
 				repo.git.add(file)
 		# make commit
 		try:
@@ -89,14 +89,36 @@ class Bot(object):
 			remote = repo.remote(remote_name)
 			remote.set_url('https://%s:%s@github.com/%s/%s.git' %\
 				(settings.USERNAME, settings.PASSWORD, settings.USERNAME, repo_name))
+			remote.pull()
 			remote.push()
 		except GitCommandError:
 			raise BranchUpToDateException
 
+	def run(self):
+		# prepare all files abailable
+		search_for = os.sep.join([settings.DEFAULT_SOURCE_ROOT_DIR,
+								  settings.DEFAULT_REPO,
+								  '**', '*.*'])
+		prefix = settings.DEFAULT_SOURCE_ROOT_DIR + os.sep + settings.DEFAULT_REPO + os.sep
+		files = [f.replace(prefix, '') for f in glob.glob(search_for, recursive=True)]
+		# randomly choose one and make commit
+		chosen_files = list(random.sample(set(files), random.randint(1, 4)))
+		''' problematic, will not make dirs on the github side
+		self.remote_addfiles_commit(repo_name=settings.DEFAULT_REPO,
+									file_list = chosen_files,
+									message='add files %s' % chosen_files)
+		'''
+		message = ' '.join(['add files:']+[os.path.basename(f) for f in chosen_files])
+		self.addfiles_commit_push_remote(repo_name=settings.DEFAULT_REPO,
+										 root_dir=settings.DEFAULT_CLONE_ROOT_DIR,
+										 file_list=chosen_files,
+										 message=message)
+		
 if __name__ == "__main__":
 	bot = Bot()
 	bot.login()
-	print(bot.report_status(repo_name=settings.DEFAULT_REPO))
+	#print(bot.report_status(repo_name=settings.DEFAULT_REPO))
+	bot.run()
 	''' # make a local clone repo, make changes, and commit -> push
 	try:
 		bot.repo_clone(repo_name=settings.DEFAULT_REPO,
