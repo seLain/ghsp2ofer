@@ -1,4 +1,5 @@
 import os, logging, shutil, glob, random, time
+from datetime import datetime, timedelta
 from github import Github, InputGitTreeElement
 from git import Repo
 from git.exc import GitCommandError
@@ -132,7 +133,10 @@ class Bot(object):
 			print('auto commit.')
 			self.random_auto_commit()
 			print('done. going sleep...')
-			time.sleep(60*random.randint(settings.RANDOM_MIN_MINUTES, settings.RANDOM_MAX_MINUTES))
+			sleep_hours = random.randint(settings.RANDOM_MIN_MINUTES, settings.RANDOM_MAX_MINUTES)
+			awake_time = datetime.now() + timedelta(hours=sleep_hours)
+			print('scheduled to sleep %s hours. next awake: %s' % (sleep_hours, awake_time))
+			time.sleep(60*sleep_hours)
 			print('awake.')
 
 		
