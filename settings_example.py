@@ -1,6 +1,7 @@
 # GitHub repository access token
 USERNAME = ''
 PASSWORD = ''
+EMAIL = ''
 ACCESS_TOKEN = ''
 
 # Name of default repository

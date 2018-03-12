@@ -1,4 +1,4 @@
-import os, logging, shutil, glob, random
+import os, logging, shutil, glob, random, time
 from github import Github, InputGitTreeElement
 from git import Repo
 from git.exc import GitCommandError
@@ -85,16 +85,17 @@ class Bot(object):
 				repo.git.add(file)
 		# make commit
 		try:
-			repo.git.commit('-m %s' % message)
+			repo.git.commit('--author=\"%s <%s>\" -m %s' % (settings.USERNAME, settings.EMAIL, message))
 			remote = repo.remote(remote_name)
 			remote.set_url('https://%s:%s@github.com/%s/%s.git' %\
 				(settings.USERNAME, settings.PASSWORD, settings.USERNAME, repo_name))
 			remote.pull()
 			remote.push()
-		except GitCommandError:
+		except GitCommandError as e:
+			print(e)
 			raise BranchUpToDateException
 
-	def run(self):
+	def random_auto_commit(self):
 		# prepare all files abailable
 		search_for = os.sep.join([settings.DEFAULT_SOURCE_ROOT_DIR,
 								  settings.DEFAULT_REPO,
@@ -120,6 +121,15 @@ class Bot(object):
 									message=message)
 		else:
 			raise DefaultCommitToolException
+
+	def run(self):
+		while True:
+			print('auto commit.')
+			self.random_auto_commit()
+			print('done. going sleep...')
+			time.sleep(60*random.randint(60, 120))
+			print('awake.')
+
 		
 if __name__ == "__main__":
 	bot = Bot()
