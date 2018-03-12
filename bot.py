@@ -123,6 +123,11 @@ class Bot(object):
 			raise DefaultCommitToolException
 
 	def run(self):
+		try:
+			bot.repo_clone(repo_name=settings.DEFAULT_REPO,
+						   root_dir=settings.DEFAULT_CLONE_ROOT_DIR)
+		except ClonedRepoExistedError:
+			print('Repository existed. Does not clone.')
 		while True:
 			print('auto commit.')
 			self.random_auto_commit()
