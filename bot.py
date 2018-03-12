@@ -127,7 +127,7 @@ class Bot(object):
 			print('auto commit.')
 			self.random_auto_commit()
 			print('done. going sleep...')
-			time.sleep(60*random.randint(60, 120))
+			time.sleep(60*random.randint(settings.RANDOM_MIN_MINUTES, settings.RANDOM_MAX_MINUTES))
 			print('awake.')
 
 		
