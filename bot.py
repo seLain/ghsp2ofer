@@ -133,10 +133,10 @@ class Bot(object):
 			print('auto commit.')
 			self.random_auto_commit()
 			print('done. going sleep...')
-			sleep_hours = random.randint(settings.RANDOM_MIN_MINUTES, settings.RANDOM_MAX_MINUTES)
-			awake_time = datetime.now() + timedelta(hours=sleep_hours)
-			print('scheduled to sleep %s hours. next awake: %s' % (sleep_hours, awake_time))
-			time.sleep(60*sleep_hours)
+			sleep_minutes = random.randint(settings.RANDOM_MIN_MINUTES, settings.RANDOM_MAX_MINUTES)
+			awake_time = datetime.now() + timedelta(minutes=sleep_minutes)
+			print('scheduled to sleep %s minutes. next awake: %s' % (sleep_minutes, awake_time))
+			time.sleep(60*sleep_minutes)
 			print('awake.')
 
 		
