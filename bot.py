@@ -85,7 +85,7 @@ class Bot(object):
 				repo.git.add(file)
 		# make commit
 		try:
-			repo.git.commit('--author=\"%s <%s>\" -m %s' % (settings.USERNAME, settings.EMAIL, message))
+			repo.git.commit('-m %s' % message)
 			remote = repo.remote(remote_name)
 			remote.set_url('https://%s:%s@github.com/%s/%s.git' %\
 				(settings.USERNAME, settings.PASSWORD, settings.USERNAME, repo_name))
