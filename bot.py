@@ -115,7 +115,6 @@ class Bot(object):
 												 message=message)
 			except BranchUpToDateException:
 				print('up to date. nothing to do. pass.')
-				pass
 		elif settings.DEFAULT_COMMIT_TOOL == 'PyGithub':
 			self.remote_addfiles_commit(repo_name=settings.DEFAULT_REPO,
 									file_list=chosen_files,
@@ -139,7 +138,6 @@ class Bot(object):
 			time.sleep(60*sleep_minutes)
 			print('awake.')
 
-		
 if __name__ == "__main__":
 	bot = Bot()
 	bot.login()
