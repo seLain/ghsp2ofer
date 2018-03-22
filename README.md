@@ -1,14 +1,40 @@
-# ghsp2ofer
-:p
+[![Python Support](https://img.shields.io/badge/python-3.6-blue.svg)]()
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/79fdd815b4f740a39fc6ec4093493410)](https://www.codacy.com/app/seLain/ghsp2ofer?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=seLain/ghsp2ofer&amp;utm_campaign=Badge_Grade)
+
+## What's This 
+
+On the way to build a fully-automated coding bot.
+
+## For Now
+
+It's a functional prototype bot which can replicate code files randomly from designated source.
+The replicated code is then committed to local git repo and pushed to Github repo.
 
 ## How2Start
 
- 1. Py3.6+ installed
- 2. create and running venv
- 3. pip install -r requirements
- 4. mv settings_example.py settings.py
- 5. create dirs root/'cloned_repos', root/'source_repos'
- 6. copy `SOURCE_PROJ` to root/'source_repos'
- 7. set settings.DEFAULT_REPO `'SOURCE_PROJ'`
- 8. set settings.RANDOM_MIN_MINUTES, settings.RANDOM_MAX_MINUTES
- 9. python bot.py
+First, be sure you have Python 3.6+ installed. (Python 3.6.5rc1+ recommended)
+
+Optionally create a virtual environment for this bot, and dive into this virtual environment.
+
+`python36 -m venv py36_venv\ghsp2ofer`
+`py36_venv\ghsp2ofer\Scripts\activate` (on Windows)
+
+Download **ghsp2ofer** and extract to a specific folder, such as `ghsp2ofer_bot`. change your working directory to `ghsp2ofer_bot`.
+
+Install required packages.
+
+`(ghsp2ofer) pip install -r requirements`
+
+Create two necessary directories: `ghsp2ofer_bot\cloned_repos`, `ghsp2ofer_bot\source_repos`.
+
+Create an empty repository on Github (wihtout .gitignore). For example, new repository `Spoofer`.
+
+Rename `ghsp2ofer_bot\settings_example.py` as `ghsp2ofer_bot\settings.py`, put necessary information in to `ghsp2ofer_bot\settings.py`.
+ * Set settings.DEFAULT_REPO as `Spoofer` ( or whatever repository name you created earlier)
+ * Set settings.RANDOM_MIN_MINUTES, settings.RANDOM_MAX_MINUTES. The bot will be triggered and sleep for random(settings.RANDOM_MIN_MINUTES, settings.RANDOM_MAX_MINUTES) minutes. 
+
+Create directory `ghsp2ofer_bot\source_repos\Spoofer`, and put in code files to be replicated.
+
+Final step,
+
+`(ghsp2ofer) python bot.py`
