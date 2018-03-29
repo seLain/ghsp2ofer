@@ -4,6 +4,7 @@ from github import Github, InputGitTreeElement
 from git import Repo
 from git.exc import GitCommandError
 from exceptions import ClonedRepoExistedError, BranchUpToDateException, DefaultCommitToolException
+from abc import ABCMeta, abstractmethod
 import settings
 
 logger = logging.getLogger(__name__)
@@ -132,11 +133,26 @@ class Bot(object):
 			print('auto commit.')
 			self.random_auto_commit()
 			print('done. going sleep...')
-			sleep_minutes = random.randint(settings.RANDOM_MIN_MINUTES, settings.RANDOM_MAX_MINUTES)
-			awake_time = datetime.now() + timedelta(minutes=sleep_minutes)
+			sleep_minutes, awake_time = RandomWaitStrategy().get_awake_time(datetime.now())
 			print('scheduled to sleep %s minutes. next awake: %s' % (sleep_minutes, awake_time))
 			time.sleep(60*sleep_minutes)
 			print('awake.')
+
+class WaitStrategy(metaclass=ABCMeta):
+	'''
+	Abstract method to get next akake time
+	:param Datetime current_time: a given current time
+	:return: sleep_minutes, awake_time
+	'''
+	@abstractmethod
+	def get_awake_time(self, current_time):
+		pass
+
+class RandomWaitStrategy(WaitStrategy):
+	def get_awake_time(self, current_time):
+		sleep_minutes = random.randint(settings.RANDOM_MIN_MINUTES, settings.RANDOM_MAX_MINUTES)
+		awake_time = current_time + timedelta(minutes=sleep_minutes)
+		return sleep_minutes, awake_time
 
 if __name__ == "__main__":
 	bot = Bot()
