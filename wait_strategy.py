@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from datetime import datetime, timedelta
+from datetime import timedelta
 from exceptions import PotentialInfiniteLoopException
 import random
 import settings
