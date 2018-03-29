@@ -3,7 +3,8 @@ from datetime import datetime, timedelta
 from github import Github, InputGitTreeElement
 from git import Repo
 from git.exc import GitCommandError
-from exceptions import ClonedRepoExistedError, BranchUpToDateException, DefaultCommitToolException
+from exceptions import ClonedRepoExistedError, BranchUpToDateException,\
+					   DefaultCommitToolException, PotentialInfiniteLoopException
 from abc import ABCMeta, abstractmethod
 import settings
 
@@ -133,7 +134,7 @@ class Bot(object):
 			print('auto commit.')
 			self.random_auto_commit()
 			print('done. going sleep...')
-			sleep_minutes, awake_time = RandomWaitStrategy().get_awake_time(datetime.now())
+			sleep_minutes, awake_time = RandomWorkHourStrategy().get_awake_time(datetime.now())
 			print('scheduled to sleep %s minutes. next awake: %s' % (sleep_minutes, awake_time))
 			time.sleep(60*sleep_minutes)
 			print('awake.')
@@ -153,6 +154,20 @@ class RandomWaitStrategy(WaitStrategy):
 		sleep_minutes = random.randint(settings.RANDOM_MIN_MINUTES, settings.RANDOM_MAX_MINUTES)
 		awake_time = current_time + timedelta(minutes=sleep_minutes)
 		return sleep_minutes, awake_time
+
+class RandomWorkHourStrategy(WaitStrategy):
+	def get_awake_time(self, current_time):
+		work_hours = settings.WORK_HOURS
+		infinite_loop_sentinel = 0
+		while True:
+			if infinite_loop_sentinel > 100:
+				raise PotentialInfiniteLoopException
+			sleep_minutes = random.randint(settings.RANDOM_MIN_MINUTES, settings.RANDOM_MAX_MINUTES)
+			awake_time = current_time + timedelta(minutes=sleep_minutes)
+			if awake_time.hour in range(work_hours[0], work_hours[1]):
+				return sleep_minutes, awake_time
+			else:
+				infinite_loop_sentinel += 1
 
 if __name__ == "__main__":
 	bot = Bot()

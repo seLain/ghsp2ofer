@@ -8,3 +8,6 @@ class BranchUpToDateException(Exception):
 
 class DefaultCommitToolException(Exception):
 	pass
+
+class PotentialInfiniteLoopException(Exception):
+	pass
