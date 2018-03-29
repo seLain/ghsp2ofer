@@ -1,11 +1,11 @@
 import os, logging, shutil, glob, random, time
-from datetime import datetime, timedelta
+from datetime import datetime
 from github import Github, InputGitTreeElement
 from git import Repo
 from git.exc import GitCommandError
 from exceptions import ClonedRepoExistedError, BranchUpToDateException,\
-					   DefaultCommitToolException, PotentialInfiniteLoopException
-from abc import ABCMeta, abstractmethod
+					   DefaultCommitToolException
+import importlib
 import settings
 
 logger = logging.getLogger(__name__)
@@ -134,40 +134,13 @@ class Bot(object):
 			print('auto commit.')
 			self.random_auto_commit()
 			print('done. going sleep...')
-			sleep_minutes, awake_time = RandomWorkHourStrategy().get_awake_time(datetime.now())
+			# dynamic strategy loading according to settings.py
+			strategy_module = importlib.import_module('wait_strategy')
+			strategy_class = getattr(strategy_module, settings.WAIT_STRATEGY)
+			sleep_minutes, awake_time = strategy_class().get_awake_time(datetime.now())
 			print('scheduled to sleep %s minutes. next awake: %s' % (sleep_minutes, awake_time))
 			time.sleep(60*sleep_minutes)
 			print('awake.')
-
-class WaitStrategy(metaclass=ABCMeta):
-	'''
-	Abstract method to get next akake time
-	:param Datetime current_time: a given current time
-	:return: sleep_minutes, awake_time
-	'''
-	@abstractmethod
-	def get_awake_time(self, current_time):
-		pass
-
-class RandomWaitStrategy(WaitStrategy):
-	def get_awake_time(self, current_time):
-		sleep_minutes = random.randint(settings.RANDOM_MIN_MINUTES, settings.RANDOM_MAX_MINUTES)
-		awake_time = current_time + timedelta(minutes=sleep_minutes)
-		return sleep_minutes, awake_time
-
-class RandomWorkHourStrategy(WaitStrategy):
-	def get_awake_time(self, current_time):
-		work_hours = settings.WORK_HOURS
-		infinite_loop_sentinel = 0
-		while True:
-			if infinite_loop_sentinel > 100:
-				raise PotentialInfiniteLoopException
-			sleep_minutes = random.randint(settings.RANDOM_MIN_MINUTES, settings.RANDOM_MAX_MINUTES)
-			awake_time = current_time + timedelta(minutes=sleep_minutes)
-			if awake_time.hour in range(work_hours[0], work_hours[1]):
-				return sleep_minutes, awake_time
-			else:
-				infinite_loop_sentinel += 1
 
 if __name__ == "__main__":
 	bot = Bot()
