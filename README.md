@@ -31,7 +31,11 @@ Create an empty repository on Github (wihtout .gitignore). For example, new repo
 
 Rename `ghsp2ofer_bot\settings_example.py` as `ghsp2ofer_bot\settings.py`, put necessary information in to `ghsp2ofer_bot\settings.py`.
  * Set settings.DEFAULT_REPO as `Spoofer` ( or whatever repository name you created earlier)
- * Set settings.RANDOM_MIN_MINUTES, settings.RANDOM_MAX_MINUTES. The bot will be triggered and sleep for random(settings.RANDOM_MIN_MINUTES, settings.RANDOM_MAX_MINUTES) minutes. 
+ * Set settings.WAIT_STRATEGY, currently two strategies are available:
+   1. RandomWaitStrategy: delays next commit by random(settings.RANDOM_MIN_MINUTES, settings.RANDOM_MAX_MINUTES) minutes.
+   2. RandomWorkHourStrategy: delays next commit by random(settings.RANDOM_MIN_MINUTES, settings.RANDOM_MAX_MINUTES) minutes if and only if the next commit time lays in settings.WORK_HOURS
+ * Set settings.RANDOM_MIN_MINUTES, settings.RANDOM_MAX_MINUTES. The bot will be triggered and sleep for random(settings.RANDOM_MIN_MINUTES, settings.RANDOM_MAX_MINUTES) minutes.
+ * Set settings.WORK_HOURS which specifies working hours of this bot. 
 
 Create directory `ghsp2ofer_bot\source_repos\Spoofer`, and put in code files to be replicated.
 
