@@ -80,12 +80,14 @@ class Bot(object):
 			dest = os.sep.join([repo_dir, file])
 			try:
 				shutil.copy2(src, dest)
-				repo.git.add(file)
 			except IOError as e: # parent directory not exists or something wrong
 				# creating parent directories
 				os.makedirs(os.path.dirname(dest))
 				shutil.copy2(src, dest)
+			try:
 				repo.git.add(file)
+			except GitCommandError:
+				print('File %s can not be added. Possibly being ruled out by .gitignore. This file is passed.' % file)
 		# make commit
 		try:
 			repo.git.commit('-m %s' % message)
