@@ -128,13 +128,13 @@ class Bot(object):
 
 	def auto_pull_request(self, title, message, base_branch, head_branch, can_modify=True):
 		"""
-		Create a PR from fork to origin. ex, from 'fork:bug-fix' to 'origin:master'.
+		Create a PR from head branch to base branch. ex, from 'head:bug-fix' to 'base:master'.
 		Please note that `auto_pull_request` can not create cross-repo pull request,
 		such as making a PR to upstream repository.
 		:param title: string - title of PR
 		:param message: string - the message body of PR
-		:param base_branch: string - the base branch of this PR, ex: 'bug-fix'
-		:param head_branch: string - the target branch of this PR, ex: 'master'
+		:param base_branch: string - the base branch of this PR, ex: 'master'
+		:param head_branch: string - the target branch of this PR, ex: 'bug-fix'
 		:param can_modify: bool - mark if repo maitainer can modify this PR
 		"""
 		repo = self.github.get_user().get_repo(name=settings.DEFAULT_REPO)
