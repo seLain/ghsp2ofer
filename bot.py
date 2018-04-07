@@ -126,6 +126,20 @@ class Bot(object):
 		else:
 			raise DefaultCommitToolException
 
+	def auto_pull_request(self, title, message, base_branch, head_branch, can_modify=True):
+		"""
+		Create a PR from fork to origin. ex, from 'fork:bug-fix' to 'origin:master'.
+		Please note that `auto_pull_request` can not create cross-repo pull request,
+		such as making a PR to upstream repository.
+		:param title: string - title of PR
+		:param message: string - the message body of PR
+		:param base_branch: string - the base branch of this PR, ex: 'bug-fix'
+		:param head_branch: string - the target branch of this PR, ex: 'master'
+		:param can_modify: bool - mark if repo maitainer can modify this PR
+		"""
+		repo = self.github.get_user().get_repo(name=settings.DEFAULT_REPO)
+		repo.create_pull(title, message, base_branch, head_branch, can_modify)
+
 	def run(self):
 		try:
 			bot.repo_clone(repo_name=settings.DEFAULT_REPO,
