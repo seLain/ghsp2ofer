@@ -96,10 +96,6 @@ class Bot(object):
 		# make commit
 		try:
 			repo.git.commit('-m %s' % message)
-			remote = repo.remote(remote_name)
-			remote.set_url('https://%s:%s@github.com/%s/%s.git' %\
-				(settings.USERNAME, settings.PASSWORD, settings.USERNAME, repo_name))
-			remote.pull()
 			remote.push()
 		except GitCommandError as e:
 			print(e)
