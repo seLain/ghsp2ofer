@@ -74,6 +74,11 @@ class Bot(object):
 		# load repo
 		repo_dir = os.sep.join([root_dir, repo_name])
 		repo = Repo(repo_dir)
+		# always pull first
+		remote = repo.remote(remote_name)
+		remote.set_url('https://%s:%s@github.com/%s/%s.git' %\
+			(settings.USERNAME, settings.PASSWORD, settings.USERNAME, repo_name))
+		remote.pull()
 		# copy and add files specified to local repository
 		for file in file_list:
 			src = os.sep.join([settings.DEFAULT_SOURCE_ROOT_DIR, repo_name, file])
